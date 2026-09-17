@@ -1,0 +1,35 @@
+# CoreDesk CRM Production robots.txt
+# Public marketing and growth routes are indexable.
+# Authenticated workspace, admin, and session routes are strictly non-indexable.
+
+User-agent: *
+Allow: /
+Allow: /features
+Allow: /solutions
+Allow: /pricing
+Allow: /use-cases
+Allow: /use-cases/*
+Allow: /blog
+Allow: /blog/*
+Allow: /compare
+Allow: /compare/*
+
+# Disallow private and operational CRM endpoints
+Disallow: /app/
+Disallow: /app
+Disallow: /login
+Disallow: /signup
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /leads
+Disallow: /contacts
+Disallow: /companies
+Disallow: /deals
+Disallow: /pipeline
+Disallow: /tasks
+Disallow: /activities
+Disallow: /reports
+Disallow: /settings
+Disallow: /api/
+
+Sitemap: https://coredesk.crm/sitemap.xml

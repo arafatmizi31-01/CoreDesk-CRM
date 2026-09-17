@@ -1,0 +1,116 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isMember(orgId) {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/organizations/$(orgId)/members/$(request.auth.uid));
+    }
+
+    function getMemberRole(orgId) {
+      return get(/databases/$(database)/documents/organizations/$(orgId)/members/$(request.auth.uid)).data.role;
+    }
+
+    function isOrgAdmin(orgId) {
+      return isMember(orgId) && (
+        getMemberRole(orgId) == 'Owner/Admin' ||
+        get(/databases/$(database)/documents/organizations/$(orgId)).data.ownerUid == request.auth.uid
+      );
+    }
+
+    function isManagerOrAdmin(orgId) {
+      return isMember(orgId) && (
+        getMemberRole(orgId) == 'Owner/Admin' ||
+        getMemberRole(orgId) == 'Manager' ||
+        get(/databases/$(database)/documents/organizations/$(orgId)).data.ownerUid == request.auth.uid
+      );
+    }
+
+    // Connection testing
+    match /test/{docId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Organizations
+    match /organizations/{orgId} {
+      // Any authenticated user can read if they are a member, or during bootstrap
+      allow read: if isMember(orgId) || (isAuthenticated() && resource.data.ownerUid == request.auth.uid);
+      // Create new org: must be authenticated and set as ownerUid
+      allow create: if isAuthenticated() && request.resource.data.ownerUid == request.auth.uid;
+      // Update/delete org: only Owner/Admin
+      allow update, delete: if isOrgAdmin(orgId);
+
+      // Members subcollection
+      match /members/{memberId} {
+        allow read: if isMember(orgId) || (isAuthenticated() && request.auth.uid == memberId);
+        // Can add member if admin or if bootstrap creating own record as owner
+        allow create: if (isAuthenticated() && request.auth.uid == memberId) || isOrgAdmin(orgId);
+        allow update: if isOrgAdmin(orgId) || (isAuthenticated() && request.auth.uid == memberId && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']));
+        allow delete: if isOrgAdmin(orgId) && memberId != request.auth.uid;
+      }
+
+      // Leads subcollection
+      match /leads/{leadId} {
+        allow read: if isMember(orgId);
+        allow create, update: if isMember(orgId) && request.resource.data.organizationId == orgId;
+        allow delete: if isManagerOrAdmin(orgId);
+      }
+
+      // Contacts subcollection
+      match /contacts/{contactId} {
+        allow read: if isMember(orgId);
+        allow create, update: if isMember(orgId) && request.resource.data.organizationId == orgId;
+        allow delete: if isManagerOrAdmin(orgId);
+      }
+
+      // Companies subcollection
+      match /companies/{companyId} {
+        allow read: if isMember(orgId);
+        allow create, update: if isMember(orgId) && request.resource.data.organizationId == orgId;
+        allow delete: if isManagerOrAdmin(orgId);
+      }
+
+      // Deals subcollection
+      match /deals/{dealId} {
+        allow read: if isMember(orgId);
+        allow create, update: if isMember(orgId) && request.resource.data.organizationId == orgId;
+        allow delete: if isManagerOrAdmin(orgId);
+      }
+
+      // Tasks subcollection
+      match /tasks/{taskId} {
+        allow read: if isMember(orgId);
+        allow create, update: if isMember(orgId) && request.resource.data.organizationId == orgId;
+        allow delete: if isMember(orgId);
+      }
+
+      // Activities subcollection
+      match /activities/{activityId} {
+        allow read: if isMember(orgId);
+        allow create: if isMember(orgId) && request.resource.data.organizationId == orgId && request.resource.data.actorId == request.auth.uid;
+        allow update: if isMember(orgId) && (resource.data.actorId == request.auth.uid || isOrgAdmin(orgId));
+        allow delete: if isOrgAdmin(orgId);
+      }
+
+      // Notifications subcollection
+      match /notifications/{notificationId} {
+        allow read: if isMember(orgId) && (resource.data.userId == request.auth.uid || isOrgAdmin(orgId));
+        allow create: if isMember(orgId);
+        allow update: if isMember(orgId) && resource.data.userId == request.auth.uid;
+        allow delete: if isMember(orgId) && resource.data.userId == request.auth.uid;
+      }
+
+      // Audit logs: append-only, tamper-proof
+      match /auditLogs/{logId} {
+        allow read: if isManagerOrAdmin(orgId);
+        allow create: if isMember(orgId) && request.resource.data.organizationId == orgId;
+        allow update, delete: if false; // Immutable audit log
+      }
+    }
+  }
+}

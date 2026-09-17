@@ -1,0 +1,242 @@
+{
+  "entities": {
+    "Organization": {
+      "title": "Organization",
+      "description": "CoreDesk CRM organization workspace",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "ownerUid": { "type": "string" },
+        "currency": { "type": "string" },
+        "timezone": { "type": "string" },
+        "staleDealDays": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "ownerUid", "currency", "timezone", "createdAt", "updatedAt"]
+    },
+    "Member": {
+      "title": "Organization Member",
+      "description": "User membership and role in an organization",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "organizationId": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["Owner/Admin", "Manager", "Sales Rep"] },
+        "joinedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "organizationId", "name", "email", "role", "joinedAt"]
+    },
+    "Lead": {
+      "title": "Lead",
+      "description": "Prospective buyer lead record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "organizationId": { "type": "string" },
+        "name": { "type": "string" },
+        "companyId": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "source": { "type": "string" },
+        "status": { "type": "string", "enum": ["New", "Contacted", "Qualified", "Unqualified", "Converted"] },
+        "priority": { "type": "string", "enum": ["Low", "Medium", "High"] },
+        "ownerId": { "type": "string" },
+        "estimatedValue": { "type": "number" },
+        "lastContactedAt": { "type": "string" },
+        "nextFollowUpAt": { "type": "string" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "organizationId", "name", "status", "priority", "createdAt", "updatedAt"]
+    },
+    "Contact": {
+      "title": "Contact",
+      "description": "Individual customer or prospect point of contact",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "organizationId": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "companyId": { "type": "string" },
+        "title": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "source": { "type": "string" },
+        "tags": { "type": "array" },
+        "notes": { "type": "string" },
+        "lastContactedAt": { "type": "string" },
+        "nextFollowUpAt": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "organizationId", "name", "createdAt", "updatedAt"]
+    },
+    "Company": {
+      "title": "Company",
+      "description": "Target or client company account",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "organizationId": { "type": "string" },
+        "name": { "type": "string" },
+        "industry": { "type": "string" },
+        "website": { "type": "string" },
+        "size": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "address": { "type": "string" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "organizationId", "name", "createdAt", "updatedAt"]
+    },
+    "Deal": {
+      "title": "Deal",
+      "description": "Pipeline sales opportunity",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "organizationId": { "type": "string" },
+        "title": { "type": "string" },
+        "companyId": { "type": "string" },
+        "contactId": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "pipelineId": { "type": "string" },
+        "stageId": { "type": "string" },
+        "value": { "type": "number" },
+        "probability": { "type": "number" },
+        "expectedCloseDate": { "type": "string" },
+        "status": { "type": "string", "enum": ["Open", "Won", "Lost"] },
+        "priority": { "type": "string", "enum": ["Low", "Medium", "High"] },
+        "lastActivityAt": { "type": "string" },
+        "nextAction": { "type": "string" },
+        "nextActionAt": { "type": "string" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "organizationId", "title", "stageId", "value", "status", "createdAt", "updatedAt"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "Sales action item or to-do",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "organizationId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "dueAt": { "type": "string" },
+        "priority": { "type": "string", "enum": ["Low", "Medium", "High"] },
+        "status": { "type": "string", "enum": ["Pending", "In Progress", "Completed", "Cancelled"] },
+        "relatedEntityType": { "type": "string" },
+        "relatedEntityId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "completedAt": { "type": "string" }
+      },
+      "required": ["id", "organizationId", "title", "status", "priority", "createdAt"]
+    },
+    "Activity": {
+      "title": "Activity",
+      "description": "Logged sales touchpoint or communication",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "organizationId": { "type": "string" },
+        "type": { "type": "string", "enum": ["Call", "Email", "Meeting", "Note", "Follow-up", "Other"] },
+        "subject": { "type": "string" },
+        "description": { "type": "string" },
+        "actorId": { "type": "string" },
+        "relatedEntityType": { "type": "string" },
+        "relatedEntityId": { "type": "string" },
+        "occurredAt": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "organizationId", "type", "subject", "actorId", "occurredAt", "createdAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "Actionable CRM alert or event notification",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "organizationId": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "read": { "type": "boolean" },
+        "link": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "organizationId", "userId", "title", "message", "read", "createdAt"]
+    },
+    "AuditLog": {
+      "title": "Audit Log",
+      "description": "Tamper-evident system activity and change log",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "organizationId": { "type": "string" },
+        "actorId": { "type": "string" },
+        "entityType": { "type": "string" },
+        "entityId": { "type": "string" },
+        "action": { "type": "string" },
+        "before": { "type": "string" },
+        "after": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "organizationId", "actorId", "entityType", "entityId", "action", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/organizations/{organizationId}": {
+      "schema": "Organization",
+      "description": "Workspace root document"
+    },
+    "/organizations/{organizationId}/members/{userId}": {
+      "schema": "Member",
+      "description": "Team members in workspace"
+    },
+    "/organizations/{organizationId}/leads/{leadId}": {
+      "schema": "Lead",
+      "description": "Leads owned by the workspace"
+    },
+    "/organizations/{organizationId}/contacts/{contactId}": {
+      "schema": "Contact",
+      "description": "Contacts owned by the workspace"
+    },
+    "/organizations/{organizationId}/companies/{companyId}": {
+      "schema": "Company",
+      "description": "Companies owned by the workspace"
+    },
+    "/organizations/{organizationId}/deals/{dealId}": {
+      "schema": "Deal",
+      "description": "Deals owned by the workspace"
+    },
+    "/organizations/{organizationId}/tasks/{taskId}": {
+      "schema": "Task",
+      "description": "Tasks owned by the workspace"
+    },
+    "/organizations/{organizationId}/activities/{activityId}": {
+      "schema": "Activity",
+      "description": "Activities logged in the workspace"
+    },
+    "/organizations/{organizationId}/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "User notifications"
+    },
+    "/organizations/{organizationId}/auditLogs/{logId}": {
+      "schema": "AuditLog",
+      "description": "Audit trail entries"
+    }
+  }
+}

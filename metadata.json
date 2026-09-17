@@ -1,0 +1,6 @@
+{
+  "name": "CoreDesk CRM",
+  "description": "Action-first CRM web application for small businesses and growing sales teams.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
